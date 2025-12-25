@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>HomeSearch - Сдать жильё</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header_inner">
+                <div class="header_logo">
+                    <div class="header_logo_txt">HomeSearch</div>
+                </div> 
+                <nav class="nav">
+                    <a class="header_btn" href="catalog.html">каталог</a>
+                    <a class="header_btn" href="foloving.html">избранное</a>
+                    <a class="header_btn" href="sell.html">сдать жильё</a>
+                    <a class="header_btn" href="buy.html">история</a>
+                </nav> 
+                <div class="profile_info">
+                    <div class="logo_profil">
+                        <img src="img/user-avatar.png" alt="Аватар">
+                    </div>         
+                    <div class="profil_name">
+                        Иван Иванов
+                    </div>
+                    <div class="profile_menu">
+                        <a href="buy.html">Профиль</a>
+                        <a href="#" id="logout">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="sell_container">
+        <div class="container">
+            <h1 class="head">
+                Управление вашим жильём
+            </h1>
+
+            <h2 class="sup_title">
+                Отслеживайте ваши объявления, статистику и доходы от аренды
+            </h2>
+
+            <!-- Статистика -->
+            <div class="stats_container">
+                <div class="stat_card">
+                    <div class="stat_icon">
+                        <img src="img/home (1).png" alt="">
+                    </div>
+                    <div class="stat_content">
+                        <div class="stat_number" id="totalProperties">0</div>
+                        <div class="stat_label">Всего объектов</div>
+                    </div>
+                </div>
+                <div class="stat_card">
+                    <div class="stat_icon">
+                        <img src="img/home (1).png" alt="">
+                    </div>
+                    <div class="stat_content">
+                        <div class="stat_number" id="activeProperties">0</div>
+                        <div class="stat_label">Активных</div>
+                    </div>
+                </div>
+                <div class="stat_card">
+                    <div class="stat_icon">
+                        <img src="img/rubles.png" alt="">
+                    </div>
+                    <div class="stat_content">
+                        <div class="stat_number" id="totalEarnings">0 ₽</div>
+                        <div class="stat_label">Общий доход</div>
+                    </div>
+                </div>
+                <div class="stat_card">
+                    <div class="stat_icon">
+                        <img src="img/star.png">
+                    </div>
+                    <div class="stat_content">
+                        <div class="stat_number" id="avgRating">0.0</div>
+                        <div class="stat_label">Средний рейтинг</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Панель управления -->
+            <div class="control_panel">
+                <button class="control_btn primary" id="addPropertyBtn">
+                    <i class="fas fa-plus"></i> Добавить объект
+                </button>
+                <div class="search_tracking">
+                    <input type="text" class="search_tracking_input" placeholder="Поиск по названию или адресу...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter_tabs">
+                    <button class="filter_tab active" data-filter="all">Все</button>
+                    <button class="filter_tab" data-filter="active">Активные</button>
+                    <button class="filter_tab" data-filter="pending">На рассмотрении</button>
+                    <button class="filter_tab" data-filter="archived">В архиве</button>
+                </div>
+            </div>
+
+            <!-- Сетка объектов -->
+            <div class="properties_grid" id="propertiesGrid">
+                <!-- Объекты будут добавлены через JavaScript -->
+            </div>
+
+            <!-- Сообщение при отсутствии объектов -->
+            <div class="no_properties" id="noProperties">
+                <div class="no_properties_icon">🏠</div>
+                <h3>У вас пока нет объектов</h3>
+                <p>Добавьте своё первое жильё для сдачи в аренду и начните зарабатывать</p>
+                <button class="add_first_btn" id="addFirstBtn">Добавить первый объект</button>
+            </div>
+
+            <!-- Модальное окно добавления -->
+            <div class="modal_overlay" id="modalOverlay">
+                <div class="modal_content add_property_modal">
+                    <button class="close_modal" id="modalClose">&times;</button>
+                    <h2 class="modal_title">Добавить новое жильё</h2>
+                    
+                    <div class="step_indicator">
+                        <div class="step_dot active" data-step="1"></div>
+                        <div class="step_dot" data-step="2"></div>
+                        <div class="step_dot" data-step="3"></div>
+                        <div class="step_dot" data-step="4"></div>
+                    </div>
+
+                    <form id="propertyForm" class="property_form">
+                        <!-- Шаг 1: Основная информация -->
+                        <div class="form_step active" id="step1">
+                            <h3>Основная информация</h3>
+                            
+                            <div class="form_group">
+                                <label for="propertyTitle">Название объекта *</label>
+                                <input type="text" id="propertyTitle" name="title" 
+                                       placeholder="Уютная квартира в центре" required>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyType">Тип жилья *</label>
+                                <select id="propertyType" name="type" required>
+                                    <option value="">Выберите тип</option>
+                                    <option value="apartment">Квартира</option>
+                                    <option value="house">Дом</option>
+                                    <option value="cottage">Коттедж</option>
+                                    <option value="hotel">Отель</option>
+                                    <option value="studio">Студия</option>
+                                    <option value="room">Комната</option>
+                                </select>
+                            </div>
+
+                            <div class="form_group">
+                                <label>Вместимость</label>
+                                <div class="capacity_grid">
+                                    <div class="capacity_item">
+                                        <label for="propertyGuests">Гостей</label>
+                                        <div class="number_selector">
+                                            <button type="button" class="number_minus">-</button>
+                                            <input type="number" id="propertyGuests" name="guests" 
+                                                   class="number_input" value="2" min="1" max="20">
+                                            <button type="button" class="number_plus">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="capacity_item">
+                                        <label for="propertyBedrooms">Спален</label>
+                                        <div class="number_selector">
+                                            <button type="button" class="number_minus">-</button>
+                                            <input type="number" id="propertyBedrooms" name="bedrooms" 
+                                                   class="number_input" value="1" min="1" max="10">
+                                            <button type="button" class="number_plus">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="capacity_item">
+                                        <label for="propertyBathrooms">Ванных</label>
+                                        <div class="number_selector">
+                                            <button type="button" class="number_minus">-</button>
+                                            <input type="number" id="propertyBathrooms" name="bathrooms" 
+                                                   class="number_input" value="1" min="1" max="10">
+                                            <button type="button" class="number_plus">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyDescription">Описание *</label>
+                                <textarea id="propertyDescription" name="description" rows="4" 
+                                          placeholder="Опишите ваше жильё, его преимущества и особенности..." 
+                                          required></textarea>
+                                <div class="char_count">
+                                    <span id="charCount">0</span>/1000 символов
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Шаг 2: Фотографии -->
+                        <div class="form_step" id="step2">
+                            <h3>Фотографии (от 2 до 5)</h3>
+                            
+                            <div class="upload_section">
+                                <div class="upload_area" id="photoUploadArea">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Перетащите сюда фотографии или</p>
+                                    <button type="button" class="upload_btn" id="uploadBtn">
+                                        Выбрать файлы
+                                    </button>
+                                    <input type="file" id="photoUpload" multiple accept="image/*" style="display: none;">
+                                    <p class="upload_hint">Можно загрузить от 2 до 5 фотографий</p>
+                                </div>
+                                
+                                <div class="photos_preview" id="photosPreview">
+                                    <!-- Превью фотографий будут добавлены здесь -->
+                                </div>
+                                
+                                <div class="photos_count">
+                                    <span id="photosCount">0</span> из 5 фотографий загружено
+                                </div>
+                                
+                                <div class="upload_rules">
+                                    <h4>Требования к фотографиям:</h4>
+                                    <ul>
+                                        <li><i class="fas fa-check"></i> Минимум 2 фото, максимум 5</li>
+                                        <li><i class="fas fa-check"></i> Формат: JPG, PNG, WebP</li>
+                                        <li><i class="fas fa-check"></i> Максимальный размер: 10 MB каждая</li>
+                                        <li><i class="fas fa-check"></i> Хорошее качество и освещение</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Шаг 3: Местоположение и цена -->
+                        <div class="form_step" id="step3">
+                            <h3>Местоположение и цена</h3>
+                            
+                            <div class="form_group">
+                                <label for="propertyCountry">Страна *</label>
+                                <select id="propertyCountry" name="country" required>
+                                    <option value="">Выберите страну</option>
+                                    <option value="ru" selected>Россия</option>
+                                    <option value="by">Беларусь</option>
+                                    <option value="kz">Казахстан</option>
+                                    <option value="ua">Украина</option>
+                                </select>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyCity">Город *</label>
+                                <input type="text" id="propertyCity" name="city" 
+                                       placeholder="Москва" required>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyAddress">Адрес *</label>
+                                <input type="text" id="propertyAddress" name="address" 
+                                       placeholder="Улица, дом, квартира" required>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyZip">Почтовый индекс</label>
+                                <input type="text" id="propertyZip" name="zip" 
+                                       placeholder="000000">
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyPrice">Цена за сутки (₽) *</label>
+                                <div class="price_input_wrapper">
+                                    <input type="number" id="propertyPrice" name="price" 
+                                           min="100" max="1000000" step="100" 
+                                           placeholder="3000" required>
+                                    <span class="currency">₽</span>
+                                </div>
+                                <div class="price_suggestions">
+                                    <span class="price_suggestion" data-price="1500">1500 ₽</span>
+                                    <span class="price_suggestion" data-price="2500">2500 ₽</span>
+                                    <span class="price_suggestion" data-price="3500">3500 ₽</span>
+                                    <span class="price_suggestion" data-price="5000">5000 ₽</span>
+                                </div>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyDiscount">Скидка за долгую аренду</label>
+                                <select id="propertyDiscount" name="discount">
+                                    <option value="0">Нет скидки</option>
+                                    <option value="5">5% за неделю</option>
+                                    <option value="10" selected>10% за неделю</option>
+                                    <option value="15">15% за неделю</option>
+                                    <option value="20">20% за месяц</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Шаг 4: Удобства и правила -->
+                        <div class="form_step" id="step4">
+                            <h3>Удобства и правила</h3>
+                            
+                            <div class="form_group">
+                                <label>Удобства</label>
+                                <div class="amenities_grid">
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="wifi">
+                                        <span class="amenity_icon">📶</span>
+                                        <span>Wi-Fi</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="parking">
+                                        <span class="amenity_icon">🅿️</span>
+                                        <span>Парковка</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="kitchen">
+                                        <span class="amenity_icon">🍳</span>
+                                        <span>Кухня</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="ac">
+                                        <span class="amenity_icon">❄️</span>
+                                        <span>Кондиционер</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="tv">
+                                        <span class="amenity_icon">📺</span>
+                                        <span>Телевизор</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="washer">
+                                        <span class="amenity_icon">🧺</span>
+                                        <span>Стиральная машина</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="breakfast">
+                                        <span class="amenity_icon">🍽️</span>
+                                        <span>Завтрак включён</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="pool">
+                                        <span class="amenity_icon">🏊</span>
+                                        <span>Бассейн</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="gym">
+                                        <span class="amenity_icon">💪</span>
+                                        <span>Спортзал</span>
+                                    </label>
+                                    <label class="amenity_checkbox">
+                                        <input type="checkbox" name="amenities" value="pet">
+                                        <span class="amenity_icon">🐾</span>
+                                        <span>Можно с животными</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyRules">Правила проживания</label>
+                                <textarea id="propertyRules" name="rules" rows="4" 
+                                          placeholder="Правила заселения, время тишины, запреты..."></textarea>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyCheckIn">Время заселения</label>
+                                <select id="propertyCheckIn" name="check_in">
+                                    <option value="flexible">Гибкое</option>
+                                    <option value="after_14">После 14:00</option>
+                                    <option value="after_15">После 15:00</option>
+                                    <option value="after_16">После 16:00</option>
+                                </select>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="propertyCheckOut">Время выезда</label>
+                                <select id="propertyCheckOut" name="check_out">
+                                    <option value="flexible">Гибкое</option>
+                                    <option value="before_11">До 11:00</option>
+                                    <option value="before_12">До 12:00</option>
+                                    <option value="before_13">До 13:00</option>
+                                </select>
+                            </div>
+
+                            <div class="preview_summary" id="previewSummary">
+                                <!-- Сводка будет добавлена здесь -->
+                            </div>
+                        </div>
+
+                        <!-- Кнопки навигации -->
+                        <div class="form_navigation">
+                            <button type="button" class="nav_btn secondary" id="prevBtn" disabled>
+                                <i class="fas fa-arrow-left"></i> Назад
+                            </button>
+                            <button type="button" class="nav_btn primary" id="nextBtn">
+                                Далее <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="nav_btn success" id="submitBtn" style="display: none;">
+                                <i class="fas fa-check"></i> Опубликовать
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Кнопка плавающего добавления -->
+            <button class="floating_add_btn" id="floatingAddBtn">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </main>
+
+    <script src="sell.js"></script>
+</body>
+</html>
